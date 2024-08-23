@@ -22,6 +22,7 @@ import { useFileHandler, useInputValidation, useStrongPassword } from "6pp";
 import { emailValidator } from "../utils/validators";
 import Title from "../components/shared/Title";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 const Login = () => {
   const theme = useTheme();
@@ -47,13 +48,46 @@ const Login = () => {
   };
 
   const handleLogin = (e) => {
+
     e.preventDefault();
-    navigate("/");
+
+    console.log(name.value, password.value);
+
+    axios.post('http://localhost:8000/api/v1/login/', {
+      username: name.value,
+      password: password.value
+    })
+    .then((response) => {
+      console.log(response.data);
+      console.log(response.data.data.profile);
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('username', response.data.data.username);
+      localStorage.setItem('userId', response.data.data.id);
+      localStorage.setItem('profile', response.data.data.profile);
+      navigate("/");
+    })
+    .catch((error) => {
+      console.log(error);
+    });
   };
 
   const handleSignUp = (e) => {
     e.preventDefault();
-    navigate("/user-details");
+    axios.post('http://localhost:8000/api/v1/signup/', {
+      username: name.value,
+      email: email.value,
+      password: password.value,
+    })
+    .then((response) => {
+      console.log(response.data.data);
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('username', response.data.data.username);
+      localStorage.setItem('userId', response.data.data.id);
+      navigate("/user-details");
+    })
+    .catch((error) => {
+      console.log(error);
+    });
   };
 
   return (
@@ -110,11 +144,11 @@ const Login = () => {
                 <TextField
                   required
                   fullWidth
-                  label="Email"
+                  label="Username"
                   margin="normal"
                   variant="outlined"
-                  value={email.value}
-                  onChange={email.changeHandler}
+                  value={name.value}
+                  onChange={name.changeHandler}
                 />
 
                 <TextField

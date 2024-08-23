@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import Title from "../shared/Title";
 import { Grid } from "@mui/material";
@@ -6,9 +6,14 @@ import ChatList from "../specific/ChatList";
 import { sampleChats } from "../../constants/sampleData";
 import { useParams } from "react-router-dom";
 import Profile from "../specific/Profile";
+import axios from "axios";
 
 const AppLayout = () => (WrappedComponent) => {
+
   return (props) => {
+
+    const [contacts, setContacts] = useState([]);
+
     const params = useParams();
     const chatId = params.chatId;
 
@@ -16,6 +21,24 @@ const AppLayout = () => (WrappedComponent) => {
       e.preventDefault();
       console.log("Delete Chat", _id, groupChat);
     };
+
+    useEffect(() => {
+
+      axios.get(`http://127.0.0.1:8000/api/v1/${localStorage.getItem('profile')}/contacts/`, {
+        headers: {
+          'Authorization': `Token ${localStorage.getItem('token')}`
+        }
+      })
+        .then((response) => {
+          console.log(response.data);
+          setContacts(response.data.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+    }, [])
+
 
     return (
       <div>

@@ -18,6 +18,7 @@ import {
 import { DeleteOutline as DeleteOutlineIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import Title from "../components/shared/Title";
+import axios from 'axios';
 
 const UserDetails = () => {
   const theme = useTheme();
@@ -189,7 +190,26 @@ const UserDetails = () => {
 
     if (Object.keys(validationErrors).length === 0) {
       console.log(formData);
-      navigate("/");
+      console.log(formData.occupation.toLowerCase());
+      const url = `http://localhost:8000/api/v1/${formData.occupation.toLowerCase()}/profile/`; 
+      axios.post(url, {
+        department: formData.educationSections[0].major,
+        college_name: formData.educationSections[0].institution,
+        passout_year: formData.educationSections[0].yearOfPassing,
+        job_role: formData.experienceSections[0].designation,
+        company_name: formData.experienceSections[0].companyName,
+      }, {
+        headers: {
+          Authorization: `Token ${localStorage.getItem('token')}`,
+        },
+      })
+        .then((response) => {
+          console.log(response);
+          navigate("/");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
   };
 
